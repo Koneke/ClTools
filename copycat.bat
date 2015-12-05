@@ -1,2 +1,2 @@
 @echo off
-python cf.py %*
+python %~dp0\cf.py %*
