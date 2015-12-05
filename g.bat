@@ -1,2 +1,2 @@
 @echo off
-C: && cd C:/Users/Lukas/Git
+cd /D %homedrive%%homepath%/Git

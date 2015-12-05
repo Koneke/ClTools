@@ -1,2 +1,2 @@
 @echo off
-C: && cd C:/Users/Lukas/Bin
+cd /D %homedrive%%homepath%/Bin
