@@ -71,7 +71,7 @@ if('copycat-clipboard' in os.environ):
     clipboardpath = os.environ['copycat-clipboard'] + os.environ['homepath'];
 else:
     clipboardpath = os.environ['homedrive'] + os.environ['homepath'];
-    clipboardpath += '\\bin\\copycat-clipboard';
+    clipboardpath += '.copycat-clipboard';
 
 try:
     # Setup mode.

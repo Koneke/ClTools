@@ -1,2 +1,2 @@
 @echo off
-python %~dp0\cf.py %*
+python %~dp0\copycat.py %*
