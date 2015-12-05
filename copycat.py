@@ -10,6 +10,8 @@ optionIndices['path'] = 0;
 
 switches = [];
 
+isWildcard = lambda path: getName(path) == '*';
+
 def readMode(line):
     return line.split(' ')[0];
 
@@ -27,6 +29,9 @@ def getName(path):
 
 def getFullPath(path):
     return os.getcwd() + '\\' + path;
+
+def getDirectory(path):
+    return '\\'.join(getFullPath(path).split('\\')[:-1]);
 
 def deleteLine(targetLine):
     global clipboardpath;
@@ -57,14 +62,23 @@ def append(mode, path):
     if not os.path.exists(path):
         raise Exception('No such file: ' + path);
     
-    #with open(path) as f:
     if '-d' in switches:
+        print('');
         print('name: ' + getName(path));
         print('path: ' + getFullPath(path));
         print('');
 
     if alreadyExists(path) == False:
         return ''.join([mode, ' ', getName(path), ',', getFullPath(path)]);
+
+def where(l, fn):
+    return list(filter(fn, l));
+
+def exists(l, fn):
+    return len(where(l, fn)) > 0;
+
+def negate(fn):
+    return lambda x: not fn(x);
  
 if('copycat-clipboard' in os.environ):
     clipboardpath = os.environ['copycat-clipboard'] + os.environ['homepath'];
@@ -93,7 +107,7 @@ try:
             switches.append(arg);
 
     # Clean args
-    args = list(filter(lambda x: x not in switches, args));
+    args = where(args, lambda x: x not in switches);
 
     # Setup options.
     keysToRead = optionKeysPaste if mode == 'paste' else optionKeysCopyCut;
@@ -111,7 +125,6 @@ try:
         print('options: ' + str(options));
         print('switches: ' + str(switches));
         print('args: ' + str(args));
-        print('');
 
     if mode in ['copy', 'cut']:
         # If we're not pasting, we need atleast one file supplied.
@@ -125,6 +138,19 @@ try:
         # way of doing things too though.
         open(clipboardpath, 'w').close();
 
+        # Expand wildcards.
+        wildcards = where(args, isWildcard);
+        args = where(args, negate(isWildcard));
+        if any(wildcards):
+            for wildcard in wildcards:
+                directory = getDirectory(wildcard);
+                isFile = lambda x: os.path.isfile(os.path.join(directory, x));
+                [args.append(f) for f in os.listdir(directory) if isFile(f)];
+
+        if '-d' in switches:
+            print('processed args: ' + str(args));
+
+        # Do the magic.
         out = '\n'.join([append(mode, arg) for arg in args]);
 
         with open(clipboardpath, 'a') as clipboard:
@@ -161,7 +187,6 @@ try:
                         shutil.rmtree(source);
     else:
         raise Exception('Unknown mode: ' + mode + '.');
-#except Exception as e:
-except ValueError as e:
+except Exception as e:
     print('error: ' + str(e) + '');
     print('usage: copycat (copy|c|cut|x [file1, file2 ... fileN])|paste|p [-d]');
