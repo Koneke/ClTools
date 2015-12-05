@@ -6,7 +6,7 @@ optionIndices = {};
 optionKeysCopyCut = [];
 
 optionKeysPaste = ['path'];
-optionIndices['path'] = 2;
+optionIndices['path'] = 0;
 
 switches = [];
 
@@ -22,12 +22,11 @@ def readName(line):
 def readPath(line):
     return readNonMode(line)[1].rstrip('\n') if line != '' else '';
 
-def getName(f):
-    return getPath(f).split('\\')[-1];
-    #return f.name;
+def getName(path):
+    return getFullPath(path).split('\\')[-1];
 
-def getPath(f):
-    return os.path.abspath(f.name);
+def getFullPath(path):
+    return os.getcwd() + '\\' + path;
 
 def deleteLine(targetLine):
     global clipboardpath;
@@ -48,7 +47,7 @@ def alreadyExists(f):
     with open(clipboardpath, 'r') as clipboard:
         for line in clipboard:
             if line != '':
-                if readPath(line) == getPath(f):
+                if readPath(line) == getFullPath(path):
                     return True;
     return False;
 
@@ -58,20 +57,20 @@ def append(mode, path):
     if not os.path.exists(path):
         raise Exception('No such file: ' + path);
     
-    with open(path) as f:
-        if '-d' in switches:
-            print('name: ' + getName(f));
-            print('path: ' + getPath(f));
-            print('');
+    #with open(path) as f:
+    if '-d' in switches:
+        print('name: ' + getName(path));
+        print('path: ' + getFullPath(path));
+        print('');
 
-        if alreadyExists(f) == False:
-            return ''.join([mode, ' ', getName(f), ',', getPath(f)]);
+    if alreadyExists(path) == False:
+        return ''.join([mode, ' ', getName(path), ',', getFullPath(path)]);
  
 if('copycat-clipboard' in os.environ):
     clipboardpath = os.environ['copycat-clipboard'] + os.environ['homepath'];
 else:
     clipboardpath = os.environ['homedrive'] + os.environ['homepath'];
-    clipboardpath += '.copycat-clipboard';
+    clipboardpath += '\\.copycat-clipboard';
 
 try:
     # Setup mode.
@@ -85,27 +84,28 @@ try:
     if mode in shorthands:
         mode = shorthands[mode];
 
-    # Setup options.
-    for key in optionKeysPaste if mode == 'paste' else optionKeysCopyCut:
-        if len(sys.argv) > optionIndices[key]:
-            options[key] = sys.argv[optionIndices[key]];
-        else:
-            options[key] = None;
-
-    # Mode + potential others.
-    optionCount = len(list(filter(lambda x: x != None, options)));
-
     # Clone arguments.
-    args = [arg for arg in sys.argv[2 + optionCount:]];
+    args = [arg for arg in sys.argv[2:]];
 
-    # Setup args
+    # Setup switches
     for arg in args:
         if arg[0] == '-':
             switches.append(arg);
 
+    # Clean args
     args = list(filter(lambda x: x not in switches, args));
 
+    # Setup options.
+    keysToRead = optionKeysPaste if mode == 'paste' else optionKeysCopyCut;
+    for key in keysToRead:
+        if len(args) > optionIndices[key]:
+            options[key] = args[optionIndices[key]];
+
+    # Mode + potential others.
+    optionCount = len(list(filter(lambda x: x != None, options)));
+
     if '-d' in switches:
+        print('clipboardpath: ' + clipboardpath);
         print('cwd: ' + os.getcwd());
         print('optionCount: ' + str(optionCount));
         print('options: ' + str(options));
@@ -137,24 +137,31 @@ try:
             for line in clipboard:
                 source = readPath(line);
 
-                if not options['path']:
-                    destination = ''.join([os.getcwd(), '\\', readName(line)]);
-                else:
+                if 'path' in options:
                     destination = ''.join([os.getcwd(), '\\', options['path'], '\\', readName(line)]);
+                else:
+                    destination = ''.join([os.getcwd(), '\\', readName(line)]);
 
                 copyCutMode = readMode(line);
 
                 if '-d' in switches:
                     print('source: ' + source);
                     print('destination: ' + destination);
-                    print('target path: ' + options['path']);
 
-                shutil.copyfile(source, destination);
+                    if 'path' in options:
+                        print('target path: ' + options['path']);
 
-                if copyCutMode == 'cut':
-                    os.remove(source);
+                if os.path.isfile(source):
+                    shutil.copy2(source, destination);
+                    if copyCutMode == 'cut':
+                        os.remove(source);
+                else:
+                    shutil.copytree(source, destination);
+                    if copyCutMode == 'cut':
+                        shutil.rmtree(source);
     else:
         raise Exception('Unknown mode: ' + mode + '.');
-except Exception as e:
+#except Exception as e:
+except ValueError as e:
     print('error: ' + str(e) + '');
     print('usage: copycat (copy|c|cut|x [file1, file2 ... fileN])|paste|p [-d]');
