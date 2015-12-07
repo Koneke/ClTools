@@ -1,2 +1,3 @@
 @echo off
-python %~dp0\ls.py %*
+dir %* /o:G
+REM python %~dp0\ls.py %*
