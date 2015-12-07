@@ -1,7 +1,5 @@
 import sys, lambdatools, os
 
-switches = [];
-
 def show(fpath):
 	global switches;
 	f = open(fpath);
