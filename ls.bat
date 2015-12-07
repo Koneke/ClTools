@@ -1,2 +1,2 @@
 @echo off
-dir %*
+python ls.py %*

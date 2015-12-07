@@ -9,6 +9,12 @@ def exists(self, fn):
 def negate(fn):
 	return lambda x: not fn(x);
 
+hasSetup = False;
+
 def setup():
-	curse(list, 'where', where);
-	curse(list, 'exists', exists);
+	global hasSetup;
+
+	if not hasSetup:
+		curse(list, 'where', where);
+		curse(list, 'exists', exists);
+		hasSetup = True;
