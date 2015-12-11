@@ -1,2 +1,2 @@
 @echo off
-python wc.py %*
+python %~dp0\wc.py %*
