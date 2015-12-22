@@ -27,4 +27,4 @@ if __name__ == "__main__":
 
 	if len(args) > 1:
 		with open('shortcuts\\' + args[0] + '.bat', 'w') as f:
-			f.write(createShortcut(args[0], args[1]));
+			f.write(createShortcut(args[0], ' '.join(args[1:])));

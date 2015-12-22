@@ -6,3 +6,5 @@ python make-shortcut.py dw downloads
 python make-shortcut.py g git 
 python make-shortcut.py h ;
 python make-shortcut.py -f i c:\inetpub\wwwroot\
+python make-shortcut.py docs documents
+python make-shortcut.py vs documents\Visual Studio 2015\Projects
