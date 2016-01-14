@@ -1,2 +1,2 @@
 @echo off
-dir %* /b /o:GN
+dir %* /b /o:GN /a
