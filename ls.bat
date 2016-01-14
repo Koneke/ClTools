@@ -1,2 +1,3 @@
 @echo off
-dir %* /o:GN /a
+REM show hidden files, skip first 7
+dir %* /o:GN /a | more +7
