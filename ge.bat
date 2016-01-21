@@ -1,2 +1,2 @@
 @echo off
-explorer https://github.com/%1
+call chrome https://github.com/%1
