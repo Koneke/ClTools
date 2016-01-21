@@ -7,7 +7,10 @@ def show(fpath):
 	if '-n' in switches:
 		print('\n=============== ' + fpath + ' ===============');
 
-	[print(line.rstrip('\n')) for line in f];
+	if '-f' in switches:
+		[print(fpath + ": " + line.rstrip('\n')) for line in f];
+	else:
+		[print(line.rstrip('\n')) for line in f];
 
 if __name__ == "__main__":
 	global switches;
