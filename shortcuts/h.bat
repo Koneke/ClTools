@@ -1,2 +1,2 @@
 @echo off
-if "%home%"=="" (cd /D %homedrive%%homepath%) else (cd /D %home%)
+if "%home%"=="" (cd /D %homedrive%%homepath%\home) else (cd /D %home%\home)
