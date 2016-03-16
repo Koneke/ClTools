@@ -1,7 +1,7 @@
 import sys, lambdatools;
 
 class kinput:
-	def __init__(self):
+	def __init__(self, stdinToArgs = True):
 		lambdatools.setup();
 
 		self.stdin = [];
@@ -11,5 +11,6 @@ class kinput:
 
 		if not sys.stdin.isatty():
 			for line in sys.stdin:
-				self.args.append(line.rstrip());
+				if stdinToArgs:
+					self.args.append(line.rstrip());
 				self.stdin.append(line.rstrip());
