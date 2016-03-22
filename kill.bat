@@ -1,2 +1,4 @@
 @echo off
-taskkill /im %1.exe /f
+set arg=%1
+set arg=%arg:.exe=%
+taskkill /im %arg%.exe /f
