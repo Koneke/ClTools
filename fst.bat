@@ -1,2 +1,2 @@
 @echo off
-uniq
+s 0
